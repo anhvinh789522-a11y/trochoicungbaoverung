@@ -2,97 +2,71 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Host: Phủ Xanh Ngọn Đồi Trọc</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Học Sinh: Điều Khiển Trồng Cây</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root { --green-lush: #2E7D32; --gold: #FFD700; }
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-  body { background: linear-gradient(180deg, #70c5ff 0%, #d4f0ff 45%, #bce6ab 100%); min-height: 100vh; color: #1c2833; overflow-x: hidden; }
-  header { background: #1b5e20; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-  header h1 { font-size: 1.35rem; }
-  .btn-reset { background: #f57c00; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-  .btn-reset:hover { background: #e65100; transform: scale(1.03); }
-  .layout { display: grid; grid-template-columns: 290px 1fr 340px; gap: 15px; padding: 15px; height: calc(100vh - 65px); }
-  .panel { background: rgba(255, 255, 255, 0.95); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow-y: auto; }
-  .qr-box { background: #e8f5e9; border: 2px dashed #4caf50; border-radius: 12px; padding: 8px; text-align: center; }
-  #qrcode { margin: 6px auto; background: white; padding: 6px; display: inline-block; border-radius: 6px; }
-  .team-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 8px; background: #f9fbe7; border-left: 6px solid #4caf50; font-size: 0.85rem; }
-  .team-item.x2-active { border: 2px dashed #ff9800; background: #fff8e1; }
-  .mountain-viewport { position: relative; background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%); border-radius: 20px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.1); }
-  #mountainSvg { width: 100%; height: 95%; max-height: 720px; }
-  .tier-path { fill: #8D6E63; stroke: #5D4037; stroke-width: 2; transition: fill 0.8s ease; }
-  .tier-path.green { fill: #43A047 !important; stroke: #2E7D32 !important; }
-  .tier-path.summit-green { fill: #2E7D32 !important; stroke: #FFD700 !important; }
-  .quiz-card { display: flex; flex-direction: column; gap: 10px; }
-  .q-badge { align-self: flex-start; background: #2e7d32; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; }
-  .q-text { font-size: 0.98rem; font-weight: bold; color: #1b5e20; line-height: 1.4; }
-  .ans-option { background: #f5f5f5; border: 1px solid #cfd8dc; padding: 9px 12px; border-radius: 8px; font-size: 0.86rem; }
-  .ans-option.correct { background: #c8e6c9 !important; border-color: #2e7d32 !important; font-weight: bold; }
-  .status-log { font-size: 0.82rem; color: #333; background: #f0f4c3; padding: 8px; border-radius: 8px; margin-top: auto; border-left: 4px solid #afb42b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: #e8f5e9; padding: 15px; display: flex; flex-direction: column; height: 100vh; justify-content: space-between; }
+  .header { text-align: center; }
+  .header h2 { color: #1b5e20; font-size: 1.25rem; }
+  .team-select-box { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #81c784; font-size: 1rem; font-weight: bold; color: #2e7d32; background: #fff; }
+  .x2-container { text-align: center; margin: 8px 0; }
+  .btn-x2 { background: #fff; border: 2px dashed #ff9800; color: #e65100; font-weight: bold; padding: 12px 24px; border-radius: 30px; font-size: 1rem; width: 100%; transition: 0.2s; }
+  .btn-x2.active { background: #ff9800; color: white; border-style: solid; }
+  .pad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; margin-bottom: 8px; }
+  .pad-btn {
+    border: none; border-radius: 16px; font-size: 2.2rem; font-weight: bold; color: white;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  }
+  .pad-btn:active { transform: scale(0.94); opacity: 0.85; }
+  .btn-a { background: #e53935; }
+  .btn-b { background: #1e88e5; }
+  .btn-c { background: #fbc02d; color: #333; }
+  .btn-d { background: #43a047; }
+  .footer-status { text-align: center; font-size: 0.85rem; color: #444; min-height: 24px; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🌲 Cùng Chung Tay Phủ Xanh Ngọn Đồi Trọc</h1>
-  <button class="btn-reset" onclick="resetGame()">🔄 Bắt Đầu Lại</button>
-</header>
-
-<div class="layout">
-  <div class="panel">
-    <div class="qr-box">
-      <b style="color: #2e7d32; font-size: 0.82rem;">📲 Quét mã để vào đội thi:</b>
-      <div id="qrcode"></div>
-      <p id="playerUrl" style="font-size: 0.68rem; color: #666; word-break: break-all;"></p>
-    </div>
-    <h4 style="color: #1b5e20; font-size: 0.85rem;">10 Đội Trồng Rừng:</h4>
-    <div id="teamsList" style="display: flex; flex-direction: column; gap: 5px;"></div>
-  </div>
-
-  <div class="mountain-viewport">
-    <svg id="mountainSvg" viewBox="0 0 700 650" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#fff9c4"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-      </defs>
-      <circle cx="350" cy="80" r="120" fill="url(#sunGlow)"/>
-      <circle cx="350" cy="80" r="35" fill="#fbc02d"/>
-
-      <path id="tier-0" class="tier-path" d="M 50,600 L 650,600 L 610,540 L 90,540 Z" />
-      <path id="tier-1" class="tier-path" d="M 90,540 L 610,540 L 575,480 L 125,480 Z" />
-      <path id="tier-2" class="tier-path" d="M 125,480 L 575,480 L 540,420 L 160,420 Z" />
-      <path id="tier-3" class="tier-path" d="M 160,420 L 540,420 L 505,360 L 195,360 Z" />
-      <path id="tier-4" class="tier-path" d="M 195,360 L 505,360 L 470,300 L 230,300 Z" />
-      <path id="tier-5" class="tier-path" d="M 230,300 L 470,300 L 435,240 L 265,240 Z" />
-      <path id="tier-6" class="tier-path" d="M 265,240 L 435,240 L 400,180 L 300,180 Z" />
-      <path id="tier-7" class="tier-path" d="M 300,180 L 400,180 L 375,120 L 325,120 Z" />
-      <polygon id="tier-8" class="tier-path" points="350,60 325,120 375,120" />
-
-      <g transform="translate(250, 20)">
-        <rect width="200" height="32" rx="16" fill="#ffd700" stroke="#b71c1c" stroke-width="2"/>
-        <text x="100" y="22" text-anchor="middle" fill="#b71c1c" font-size="13" font-weight="bold">🏆 ĐỈNH RỪNG XANH</text>
-      </g>
-      <g id="treesContainerLayer"></g>
-    </svg>
-  </div>
-
-  <div class="panel">
-    <div class="quiz-card">
-      <div class="q-badge" id="qBadge">Câu hỏi 1 / 8</div>
-      <div class="q-text" id="qText">Nội dung câu hỏi...</div>
-      <div id="ansBox" style="display:flex; flex-direction:column; gap:6px;"></div>
-    </div>
-    <div class="status-log" id="statusLog">📡 Đang chờ các đội bấm đáp án từ điện thoại...</div>
-  </div>
+<div class="header">
+  <h2>🌲 Bộ Bấm Chuông Trồng Rừng</h2>
 </div>
 
+<div class="team-select-box">
+  <label style="font-size: 0.85rem; font-weight: bold; color: #2e7d32; display:block; margin-bottom: 4px;">Chọn Đội Của Bạn:</label>
+  <select id="teamSelect">
+    <option value="1">🌴 Đội 1: Cọ Nhiệt Đới</option>
+    <option value="2">🌾 Đội 2: Keo Lá Tràm</option>
+    <option value="3">🌳 Đội 3: Cây Gõ Đỏ</option>
+    <option value="4">🎋 Đội 4: Tre Gai</option>
+    <option value="5">🍂 Đội 5: Giáng Hương</option>
+    <option value="6">🌲 Đội 6: Cây Sao Đen</option>
+    <option value="7">🌱 Đội 7: Cây Đước Đỏ</option>
+    <option value="8">🌺 Đội 8: Bằng Lăng Rừng</option>
+    <option value="9">🌿 Đội 9: Cây Dầu Rái</option>
+    <option value="10">🪴 Đội 10: Cây Trầm Hương</option>
+  </select>
+</div>
+
+<div class="x2-container">
+  <button id="btnX2" class="btn-x2" onclick="toggleX2()">⭐ Bật Cược x2 Điểm (1 Lần)</button>
+</div>
+
+<div class="pad-grid">
+  <button class="pad-btn btn-a" onclick="sendAnswer(0)">A</button>
+  <button class="pad-btn btn-b" onclick="sendAnswer(1)">B</button>
+  <button class="pad-btn btn-c" onclick="sendAnswer(2)">C</button>
+  <button class="pad-btn btn-d" onclick="sendAnswer(3)">D</button>
+</div>
+
+<div class="footer-status" id="feedback">Đã kết nối. Quan sát máy chiếu và bấm chọn đáp án!</div>
+
 <script>
-  // CẤU HÌNH FIREBASE REALTIME DATABASE (Thay bằng config từ Firebase của bạn)
+  // DÙNG CHUNG CẤU HÌNH VỚI FILE HOST.HTML
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -105,181 +79,41 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  const currentUrl = window.location.href;
-  const playUrl = currentUrl.replace("host.html", "play.html");
-  document.getElementById("playerUrl").textContent = playUrl;
-  new QRCode(document.getElementById("qrcode"), { text: playUrl, width: 110, height: 110 });
+  let isX2 = false;
 
-  const defaultTeams = [
-    { id: 1, name: "Cọ Nhiệt Đới", color: "#8BC34A", icon: "🌴", step: 0, x2Used: false, isX2: false },
-    { id: 2, name: "Keo Lá Tràm", color: "#FFD54F", icon: "🌾", step: 0, x2Used: false, isX2: false },
-    { id: 3, name: "Cây Gõ Đỏ", color: "#2E7D32", icon: "🌳", step: 0, x2Used: false, isX2: false },
-    { id: 4, name: "Tre Gai", color: "#4DB6AC", icon: "🎋", step: 0, x2Used: false, isX2: false },
-    { id: 5, name: "Giáng Hương", color: "#FFB74D", icon: "🍂", step: 0, x2Used: false, isX2: false },
-    { id: 6, name: "Cây Sao Đen", color: "#1B5E20", icon: "🌲", step: 0, x2Used: false, isX2: false },
-    { id: 7, name: "Cây Đước Đỏ", color: "#8D6E63", icon: "🌱", step: 0, x2Used: false, isX2: false },
-    { id: 8, name: "Bằng Lăng Rừng", color: "#BA68C8", icon: "🌺", step: 0, x2Used: false, isX2: false },
-    { id: 9, name: "Cây Dầu Rái", color: "#CDDC39", icon: "🌿", step: 0, x2Used: false, isX2: false },
-    { id: 10, name: "Cây Trầm Hương", color: "#37474F", icon: "🪴", step: 0, x2Used: false, isX2: false }
-  ];
-
-  let teams = JSON.parse(JSON.stringify(defaultTeams));
-  const tierYPositions = [570, 510, 450, 390, 330, 270, 210, 150, 95];
-
-  const questions = [
-    { q: "Vai trò nào sau đây KHÔNG PHẢI là lợi ích của rừng nhiệt đới?", opts: ["Chống sạt lở lũ quét", "Hấp thụ CO2 & tạo Oxy", "Làm tăng hiệu ứng nhà kính", "Bảo tồn đa dạng sinh học"], ans: 2 },
-    { q: "Rừng mưa nhiệt đới thường phân bố thành mấy tầng tán chính?", opts: ["2 tầng", "3 tầng", "4 - 5 tầng", "Chỉ 1 tầng"], ans: 2 },
-    { q: "Đâu là loài cây gỗ quý đặc trưng của rừng nhiệt đới Đông Nam Á?", opts: ["Cây Bạch dương", "Cây Gõ đỏ", "Xương rồng sa mạc", "Thông tuyết"], ans: 1 },
-    { q: "Hiện tượng nguy hiểm nào xảy ra khi đồi núi bị tàn phá trơ trọi đất đá?", opts: ["Hạn hán kéo dài", "Lũ quét và sạt lở đất đá", "Đất chua hóa", "Bão cát"], ans: 1 },
-    { q: "Biện pháp phục hồi đồi núi trọc bền vững nhất là gì?", opts: ["Trồng xen cây bản địa đa loài", "Đốt sạch cỏ dại", "Chỉ trồng 1 loại cây duy nhất", "Đào xới toàn bộ đồi"], ans: 0 },
-    { q: "Rừng phòng hộ có nhiệm vụ cốt lõi nào sau đây?", opts: ["Khai thác gỗ tối đa", "Chắn gió, giữ nước, chống xói mòn", "Chăn thả gia súc", "Xây dựng nhà máy xưởng"], ans: 1 },
-    { q: "Hành động nào của học sinh góp phần bảo vệ tài nguyên rừng?", opts: ["Tiết kiệm giấy vở", "Nói không với thú rừng", "Tích cực trồng cây xanh", "Tất cả các ý trên"], ans: 3 },
-    { q: "Ngày Quốc tế về Rừng được kỷ niệm vào ngày nào hằng năm?", opts: ["21 tháng 3", "22 tháng 4", "05 tháng 6", "19 tháng 8"], ans: 0 }
-  ];
-
-  let curQIndex = 0;
-
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  function playSound(type) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    if (type === 'birds') {
-      const melody = [2093, 2637, 3136, 2637, 3520, 4186, 3136, 3520];
-      melody.forEach((freq, idx) => {
-        setTimeout(() => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.16);
-          osc.connect(gain); gain.connect(audioCtx.destination);
-          osc.start(); osc.stop(audioCtx.currentTime + 0.16);
-        }, idx * 110);
-      });
-      return;
-    }
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    if (type === 'correct') {
-      osc.frequency.setValueAtTime(523, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(784, audioCtx.currentTime + 0.25);
-      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+  function toggleX2() {
+    isX2 = !isX2;
+    const btn = document.getElementById("btnX2");
+    if (isX2) {
+      btn.classList.add("active");
+      btn.textContent = "⭐ ĐÃ BẬT CƯỢC x2!";
     } else {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(160, audioCtx.currentTime);
-      osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.25);
-      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.25);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+      btn.classList.remove("active");
+      btn.textContent = "⭐ Bật Cược x2 Điểm (1 Lần)";
     }
   }
 
-  function renderUI() {
-    const list = document.getElementById('teamsList');
-    list.innerHTML = '';
-    teams.forEach(t => {
-      const item = document.createElement('div');
-      item.className = `team-item ${t.isX2 ? 'x2-active' : ''}`;
-      item.style.borderLeftColor = t.color;
-      item.innerHTML = `<span>${t.icon} <b>${t.name}</b> ${t.isX2 ? '<b style="color:#e65100;">⭐x2</b>':''}</span><b>Nấc ${t.step}/8</b>`;
-      list.appendChild(item);
+  function sendAnswer(choice) {
+    const teamId = document.getElementById("teamSelect").value;
+    const letters = ["A", "B", "C", "D"];
+
+    db.ref('answers').push({
+      teamId: teamId,
+      choice: choice,
+      isX2: isX2,
+      timestamp: Date.now()
     });
 
-    const layer = document.getElementById('treesContainerLayer');
-    layer.innerHTML = '';
-    const stepsGroup = {};
-    for (let i = 0; i <= 8; i++) stepsGroup[i] = [];
-    teams.forEach(t => stepsGroup[Math.min(t.step, 8)].push(t));
+    document.getElementById("feedback").innerHTML = `🚀 Đã gửi đáp án <b>${letters[choice]}</b> lên máy chiếu!`;
 
-    for (let s = 1; s <= 8; s++) {
-      const path = document.getElementById(`tier-${s}`);
-      const hasClimbers = teams.some(t => t.step >= s);
-      if (hasClimbers) {
-        if (s === 8) path.classList.add('summit-green');
-        else path.classList.add('green');
-      } else {
-        path.classList.remove('green', 'summit-green');
-      }
-    }
-
-    for (let s = 0; s <= 8; s++) {
-      const occupants = stepsGroup[s];
-      if (occupants.length === 0) continue;
-      const y = tierYPositions[s];
-      const spanWidth = 440 * (1 - s * 0.1);
-      const startX = 350 - spanWidth / 2;
-      const stepDist = occupants.length > 1 ? spanWidth / (occupants.length - 1) : 0;
-
-      occupants.forEach((team, idx) => {
-        const x = occupants.length === 1 ? 350 : startX + idx * stepDist;
-        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        g.setAttribute("transform", `translate(${x}, ${y})`);
-        g.innerHTML = `<circle r="15" fill="#fff" stroke="${team.color}" stroke-width="3"/><text text-anchor="middle" dy="5" font-size="13">${team.icon}</text>`;
-        layer.appendChild(g);
-      });
-    }
-
-    if (curQIndex < questions.length) {
-      const cur = questions[curQIndex];
-      document.getElementById('qBadge').textContent = `Câu hỏi ${curQIndex + 1} / 8`;
-      document.getElementById('qText').textContent = cur.q;
-      const ansBox = document.getElementById('ansBox');
-      ansBox.innerHTML = '';
-      cur.opts.forEach((txt, idx) => {
-        ansBox.innerHTML += `<div class="ans-option"><b>${String.fromCharCode(65+idx)}.</b> ${txt}</div>`;
-      });
-    } else {
-      document.getElementById('qBadge').textContent = 'HOÀN THÀNH!';
-      document.getElementById('qText').textContent = '🎉 Ngọn núi đã được phủ xanh hoàn toàn!';
-      document.getElementById('ansBox').innerHTML = '<p style="color:#2e7d32; font-weight:bold;">Tất cả thử thách đã kết thúc!</p>';
+    if (isX2) {
+      isX2 = false;
+      const btn = document.getElementById("btnX2");
+      btn.classList.remove("active");
+      btn.disabled = true;
+      btn.textContent = "Đã dùng quyền x2";
     }
   }
-
-  db.ref('answers').on('child_added', (snapshot) => {
-    const data = snapshot.val();
-    if (!data || curQIndex >= questions.length) return;
-
-    const team = teams.find(t => t.id === parseInt(data.teamId));
-    if (!team) return;
-
-    if (data.isX2 && !team.x2Used) team.isX2 = true;
-
-    const cur = questions[curQIndex];
-    const logBox = document.getElementById('statusLog');
-
-    if (data.choice === cur.ans) {
-      playSound('correct');
-      const gain = team.isX2 ? 2 : 1;
-      team.step = Math.min(team.step + gain, 8);
-      logBox.innerHTML = `✅ <b>${team.name}</b> trả lời đúng! Tiến +${gain} nấc!`;
-      
-      if (team.isX2) { team.isX2 = false; team.x2Used = true; }
-      renderUI();
-
-      if (team.step >= 8) {
-        playSound('birds');
-        setTimeout(() => alert(`🏆 ĐỘI ${team.name.toUpperCase()} ĐÃ CHẠM ĐỈNH NÚI!\nTiếng chim reo hót báo hiệu rừng xanh phục hồi!`), 300);
-      }
-
-      curQIndex++;
-      setTimeout(renderUI, 1200);
-    } else {
-      playSound('wrong');
-      logBox.innerHTML = `❌ <b>${team.name}</b> trả lời chưa đúng!`;
-      if (team.isX2) { team.isX2 = false; team.x2Used = true; renderUI(); }
-    }
-  });
-
-  function resetGame() {
-    teams = JSON.parse(JSON.stringify(defaultTeams));
-    curQIndex = 0;
-    db.ref('answers').remove();
-    renderUI();
-  }
-
-  renderUI();
 </script>
 </body>
 </html>
