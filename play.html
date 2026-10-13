@@ -3,26 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Học Sinh: Tham Gia Game Trồng Cây</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<title>Học Sinh: Điều Khiển Trồng Rừng</title>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { background: #e8f5e9; padding: 15px; display: flex; flex-direction: column; height: 100vh; justify-content: space-between; }
   
-  /* FORM ĐĂNG KÝ TÊN ĐỘI */
-  #joinForm { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: auto; width: 100%; max-width: 360px; text-align: center; }
-  #joinForm h2 { color: #1b5e20; margin-bottom: 12px; }
+  #joinCard { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: auto; width: 100%; max-width: 360px; text-align: center; }
+  #joinCard h2 { color: #1b5e20; margin-bottom: 12px; }
   input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #81c784; font-size: 1rem; margin-bottom: 12px; }
   .btn-join { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
 
-  /* GIAO DIỆN CHƠI TRẮC NGHIỆM */
-  #playArea { display: none; flex-direction: column; height: 100%; justify-content: space-between; }
-  .team-header { background: white; padding: 8px 12px; border-radius: 10px; font-weight: bold; color: #1b5e20; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+  #playScreen { display: none; flex-direction: column; height: 100%; justify-content: space-between; }
+  .team-bar { background: white; padding: 8px 12px; border-radius: 10px; font-weight: bold; color: #1b5e20; text-align: center; }
   .btn-x2 { background: #fff; border: 2px dashed #ff9800; color: #e65100; font-weight: bold; padding: 10px; border-radius: 20px; font-size: 0.95rem; margin: 6px 0; }
   .btn-x2.active { background: #ff9800; color: white; }
 
-  /* 4 NÚT TRẮC NGHIỆM LỚN THEO PHONG CÁCH KAHOOT */
   .pad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; margin: 8px 0; }
   .pad-btn { border: none; border-radius: 16px; font-size: 2.2rem; font-weight: bold; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .pad-btn:active { transform: scale(0.95); }
@@ -35,11 +31,11 @@
 </head>
 <body>
 
-<!-- MÀN HÌNH NHẬP TÊN ĐỘI & CHỌN CÂY -->
-<div id="joinForm">
-  <h2>🌲 Tham Gia Trồng Rừng</h2>
-  <input type="text" id="playerName" placeholder="Nhập tên Đội / Tên Bạn..." maxlength="15">
-  <select id="playerTree">
+<!-- MÀN HÌNH NHẬP TÊN -->
+<div id="joinCard">
+  <h2>🌲 Vào Đội Trồng Rừng</h2>
+  <input type="text" id="pName" placeholder="Nhập tên Đội / Tên Bạn..." maxlength="15">
+  <select id="pTree">
     <option value="🌴|#8BC34A">🌴 Cây Cọ Nhiệt Đới</option>
     <option value="🌾|#FFD54F">🌾 Cây Keo Lá Tràm</option>
     <option value="🌳|#2E7D32">🌳 Cây Gõ Đỏ</option>
@@ -51,82 +47,79 @@
     <option value="🌿|#CDDC39">🌿 Cây Dầu Rái</option>
     <option value="🪴|#37474F">🪴 Cây Trầm Hương</option>
   </select>
-  <button class="btn-join" onclick="joinGame()">VÀO PHÒNG CHỜ</button>
+  <button class="btn-join" onclick="connectToHost()">VÀO PHÒNG CHƠI</button>
 </div>
 
 <!-- MÀN HÌNH BẤM ĐÁP ÁN -->
-<div id="playArea">
-  <div class="team-header" id="myTeamDisplay"></div>
+<div id="playScreen">
+  <div class="team-bar" id="teamDisplay"></div>
   <button id="btnX2" class="btn-x2" onclick="toggleX2()">⭐ Bật Cược x2 Điểm (1 Lần)</button>
   
   <div class="pad-grid">
-    <button class="pad-btn btn-a" onclick="sendAnswer(0)">A</button>
-    <button class="pad-btn btn-b" onclick="sendAnswer(1)">B</button>
-    <button class="pad-btn btn-c" onclick="sendAnswer(2)">C</button>
-    <button class="pad-btn btn-d" onclick="sendAnswer(3)">D</button>
+    <button class="pad-btn btn-a" onclick="sendAns(0)">A</button>
+    <button class="pad-btn btn-b" onclick="sendAns(1)">B</button>
+    <button class="pad-btn btn-c" onclick="sendAns(2)">C</button>
+    <button class="pad-btn btn-d" onclick="sendAns(3)">D</button>
   </div>
   
-  <div class="status-text" id="feedback">Đang chờ giáo viên bấm bắt đầu trên máy chiếu...</div>
+  <div class="status-text" id="statusMsg">Đã kết nối! Quan sát máy chiếu để chọn đáp án.</div>
 </div>
 
 <script>
-  // DÙNG CHUNG CẤU HÌNH VỚI HOST.HTML
-  const firebaseConfig = {
-    apiKey: "AIzaSyCfRfGLxG48b8Cgj6PUCFNrrhpgjmn4i2A",
-    authDomain: "vuihoccungcon-ac879.firebaseapp.com",
-    databaseURL: "https://vuihoccungcon-ac879-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "vuihoccungcon-ac879",
-    storageBucket: "vuihoccungcon-ac879.firebasestorage.app",
-    messagingSenderId: "48463907829",
-    appId: "1:48463907829:web:d7f208b4e4b7b64aaeeebc"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+  // LẤY MÃ PHÒNG TỪ ĐƯỜNG LINK DO QR CODE TẠO RA
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetRoom = urlParams.get('room');
 
-  let myId = 'p_' + Math.random().toString(36).substr(2, 9);
+  const peer = new Peer();
+  let conn = null;
   let isX2 = false;
   let x2Used = false;
 
-  function joinGame() {
-    const name = document.getElementById('playerName').value.trim();
+  function connectToHost() {
+    const name = document.getElementById('pName').value.trim();
     if (!name) { alert("Vui lòng nhập tên đội!"); return; }
+    if (!targetRoom) { alert("Không tìm thấy mã phòng! Vui lòng quét lại mã QR trên máy chiếu."); return; }
 
-    const [icon, color] = document.getElementById('playerTree').value.split('|');
+    const [icon, color] = document.getElementById('pTree').value.split('|');
 
-    db.ref(`players/${myId}`).set({
-      id: myId, name: name, icon: icon, color: color, step: 0
+    conn = peer.connect(targetRoom);
+    conn.on('open', () => {
+      conn.send({ type: 'join', name: name, icon: icon, color: color });
+      document.getElementById('joinCard').style.display = 'none';
+      document.getElementById('playScreen').style.display = 'flex';
+      document.getElementById('teamDisplay').innerHTML = `${icon} <b>${name}</b>`;
     });
 
-    document.getElementById('joinForm').style.display = 'none';
-    document.getElementById('playArea').style.display = 'flex';
-    document.getElementById('myTeamDisplay').innerHTML = `${icon} <b>${name}</b>`;
+    conn.on('data', (data) => {
+      if (data.type === 'new_question') {
+        document.getElementById('statusMsg').textContent = `Câu ${data.qIndex + 1}: Hãy bấm chọn đáp án!`;
+      } else if (data.type === 'end') {
+        document.getElementById('statusMsg').textContent = `Trò chơi kết thúc!`;
+      }
+    });
   }
 
   function toggleX2() {
-    if (x2Used) { alert("Bạn đã dùng quyền x2 trước đó rồi!"); return; }
+    if (x2Used) { alert("Đã sử dụng lượt x2 trước đó!"); return; }
     isX2 = !isX2;
-    const btn = document.getElementById("btnX2");
-    btn.classList.toggle("active", isX2);
+    const btn = document.getElementById('btnX2');
+    btn.classList.toggle('active', isX2);
     btn.textContent = isX2 ? "⭐ ĐÃ BẬT CƯỢC x2!" : "⭐ Bật Cược x2 Điểm (1 Lần)";
   }
 
-  function sendAnswer(choice) {
+  function sendAns(choice) {
+    if (!conn) return;
     const letters = ["A", "B", "C", "D"];
-    db.ref(`answers/${myId}`).set({
-      choice: choice,
-      isX2: isX2,
-      timestamp: Date.now()
-    });
-
-    document.getElementById("feedback").innerHTML = `🚀 Đã gửi đáp án <b>${letters[choice]}</b>! Đợi kết quả...`;
+    conn.send({ type: 'answer', choice: choice, isX2: isX2 });
+    document.getElementById('statusMsg').innerHTML = `🚀 Đã gửi đáp án <b>${letters[choice]}</b>! Đợi kết quả...`;
 
     if (isX2) {
       isX2 = false;
       x2Used = true;
-      const btn = document.getElementById("btnX2");
+      const btn = document.getElementById('btnX2');
       btn.disabled = true;
       btn.textContent = "Đã dùng quyền x2";
-      btn.classList.remove("active");
+      btn.classList.remove('active');
     }
   }
 </script>
