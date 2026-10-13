@@ -3,70 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Học Sinh: Điều Khiển Trồng Cây</title>
+<title>Học Sinh: Tham Gia Game Trồng Cây</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { background: #e8f5e9; padding: 15px; display: flex; flex-direction: column; height: 100vh; justify-content: space-between; }
-  .header { text-align: center; }
-  .header h2 { color: #1b5e20; font-size: 1.25rem; }
-  .team-select-box { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-  select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #81c784; font-size: 1rem; font-weight: bold; color: #2e7d32; background: #fff; }
-  .x2-container { text-align: center; margin: 8px 0; }
-  .btn-x2 { background: #fff; border: 2px dashed #ff9800; color: #e65100; font-weight: bold; padding: 12px 24px; border-radius: 30px; font-size: 1rem; width: 100%; transition: 0.2s; }
-  .btn-x2.active { background: #ff9800; color: white; border-style: solid; }
-  .pad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; margin-bottom: 8px; }
-  .pad-btn {
-    border: none; border-radius: 16px; font-size: 2.2rem; font-weight: bold; color: white;
-    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-  }
-  .pad-btn:active { transform: scale(0.94); opacity: 0.85; }
+  
+  /* FORM ĐĂNG KÝ TÊN ĐỘI */
+  #joinForm { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: auto; width: 100%; max-width: 360px; text-align: center; }
+  #joinForm h2 { color: #1b5e20; margin-bottom: 12px; }
+  input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #81c784; font-size: 1rem; margin-bottom: 12px; }
+  .btn-join { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+
+  /* GIAO DIỆN CHƠI TRẮC NGHIỆM */
+  #playArea { display: none; flex-direction: column; height: 100%; justify-content: space-between; }
+  .team-header { background: white; padding: 8px 12px; border-radius: 10px; font-weight: bold; color: #1b5e20; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+  .btn-x2 { background: #fff; border: 2px dashed #ff9800; color: #e65100; font-weight: bold; padding: 10px; border-radius: 20px; font-size: 0.95rem; margin: 6px 0; }
+  .btn-x2.active { background: #ff9800; color: white; }
+
+  /* 4 NÚT TRẮC NGHIỆM LỚN THEO PHONG CÁCH KAHOOT */
+  .pad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; margin: 8px 0; }
+  .pad-btn { border: none; border-radius: 16px; font-size: 2.2rem; font-weight: bold; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .pad-btn:active { transform: scale(0.95); }
   .btn-a { background: #e53935; }
   .btn-b { background: #1e88e5; }
-  .btn-c { background: #fbc02d; color: #333; }
+  .btn-c { background: #fbc02d; color: #222; }
   .btn-d { background: #43a047; }
-  .footer-status { text-align: center; font-size: 0.85rem; color: #444; min-height: 24px; }
+  .status-text { text-align: center; font-size: 0.85rem; color: #555; }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h2>🌲 Bộ Bấm Chuông Trồng Rừng</h2>
-</div>
-
-<div class="team-select-box">
-  <label style="font-size: 0.85rem; font-weight: bold; color: #2e7d32; display:block; margin-bottom: 4px;">Chọn Đội Của Bạn:</label>
-  <select id="teamSelect">
-    <option value="1">🌴 Đội 1: Cọ Nhiệt Đới</option>
-    <option value="2">🌾 Đội 2: Keo Lá Tràm</option>
-    <option value="3">🌳 Đội 3: Cây Gõ Đỏ</option>
-    <option value="4">🎋 Đội 4: Tre Gai</option>
-    <option value="5">🍂 Đội 5: Giáng Hương</option>
-    <option value="6">🌲 Đội 6: Cây Sao Đen</option>
-    <option value="7">🌱 Đội 7: Cây Đước Đỏ</option>
-    <option value="8">🌺 Đội 8: Bằng Lăng Rừng</option>
-    <option value="9">🌿 Đội 9: Cây Dầu Rái</option>
-    <option value="10">🪴 Đội 10: Cây Trầm Hương</option>
+<!-- MÀN HÌNH NHẬP TÊN ĐỘI & CHỌN CÂY -->
+<div id="joinForm">
+  <h2>🌲 Tham Gia Trồng Rừng</h2>
+  <input type="text" id="playerName" placeholder="Nhập tên Đội / Tên Bạn..." maxlength="15">
+  <select id="playerTree">
+    <option value="🌴|#8BC34A">🌴 Cây Cọ Nhiệt Đới</option>
+    <option value="🌾|#FFD54F">🌾 Cây Keo Lá Tràm</option>
+    <option value="🌳|#2E7D32">🌳 Cây Gõ Đỏ</option>
+    <option value="🎋|#4DB6AC">🎋 Tre Gai / Trúc</option>
+    <option value="🍂|#FFB74D">🍂 Cây Giáng Hương</option>
+    <option value="🌲|#1B5E20">🌲 Cây Sao Đen</option>
+    <option value="🌱|#8D6E63">🌱 Cây Đước Đỏ</option>
+    <option value="🌺|#BA68C8">🌺 Bằng Lăng Rừng</option>
+    <option value="🌿|#CDDC39">🌿 Cây Dầu Rái</option>
+    <option value="🪴|#37474F">🪴 Cây Trầm Hương</option>
   </select>
+  <button class="btn-join" onclick="joinGame()">VÀO PHÒNG CHỜ</button>
 </div>
 
-<div class="x2-container">
+<!-- MÀN HÌNH BẤM ĐÁP ÁN -->
+<div id="playArea">
+  <div class="team-header" id="myTeamDisplay"></div>
   <button id="btnX2" class="btn-x2" onclick="toggleX2()">⭐ Bật Cược x2 Điểm (1 Lần)</button>
+  
+  <div class="pad-grid">
+    <button class="pad-btn btn-a" onclick="sendAnswer(0)">A</button>
+    <button class="pad-btn btn-b" onclick="sendAnswer(1)">B</button>
+    <button class="pad-btn btn-c" onclick="sendAnswer(2)">C</button>
+    <button class="pad-btn btn-d" onclick="sendAnswer(3)">D</button>
+  </div>
+  
+  <div class="status-text" id="feedback">Đang chờ giáo viên bấm bắt đầu trên máy chiếu...</div>
 </div>
-
-<div class="pad-grid">
-  <button class="pad-btn btn-a" onclick="sendAnswer(0)">A</button>
-  <button class="pad-btn btn-b" onclick="sendAnswer(1)">B</button>
-  <button class="pad-btn btn-c" onclick="sendAnswer(2)">C</button>
-  <button class="pad-btn btn-d" onclick="sendAnswer(3)">D</button>
-</div>
-
-<div class="footer-status" id="feedback">Đã kết nối. Quan sát máy chiếu và bấm chọn đáp án!</div>
 
 <script>
-  // DÙNG CHUNG CẤU HÌNH VỚI FILE HOST.HTML
+  // DÙNG CHUNG CẤU HÌNH VỚI HOST.HTML
   const firebaseConfig = {
     apiKey: "AIzaSyCfRfGLxG48b8Cgj6PUCFNrrhpgjmn4i2A",
     authDomain: "vuihoccungcon-ac879.firebaseapp.com",
@@ -79,41 +83,52 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
+  let myId = 'p_' + Math.random().toString(36).substr(2, 9);
   let isX2 = false;
+  let x2Used = false;
+
+  function joinGame() {
+    const name = document.getElementById('playerName').value.trim();
+    if (!name) { alert("Vui lòng nhập tên đội!"); return; }
+
+    const [icon, color] = document.getElementById('playerTree').value.split('|');
+
+    db.ref(`players/${myId}`).set({
+      id: myId, name: name, icon: icon, color: color, step: 0
+    });
+
+    document.getElementById('joinForm').style.display = 'none';
+    document.getElementById('playArea').style.display = 'flex';
+    document.getElementById('myTeamDisplay').innerHTML = `${icon} <b>${name}</b>`;
+  }
 
   function toggleX2() {
+    if (x2Used) { alert("Bạn đã dùng quyền x2 trước đó rồi!"); return; }
     isX2 = !isX2;
     const btn = document.getElementById("btnX2");
-    if (isX2) {
-      btn.classList.add("active");
-      btn.textContent = "⭐ ĐÃ BẬT CƯỢC x2!";
-    } else {
-      btn.classList.remove("active");
-      btn.textContent = "⭐ Bật Cược x2 Điểm (1 Lần)";
-    }
+    btn.classList.toggle("active", isX2);
+    btn.textContent = isX2 ? "⭐ ĐÃ BẬT CƯỢC x2!" : "⭐ Bật Cược x2 Điểm (1 Lần)";
   }
 
   function sendAnswer(choice) {
-    const teamId = document.getElementById("teamSelect").value;
     const letters = ["A", "B", "C", "D"];
-
-    db.ref('answers').push({
-      teamId: teamId,
+    db.ref(`answers/${myId}`).set({
       choice: choice,
       isX2: isX2,
       timestamp: Date.now()
     });
 
-    document.getElementById("feedback").innerHTML = `🚀 Đã gửi đáp án <b>${letters[choice]}</b> lên máy chiếu!`;
+    document.getElementById("feedback").innerHTML = `🚀 Đã gửi đáp án <b>${letters[choice]}</b>! Đợi kết quả...`;
 
     if (isX2) {
       isX2 = false;
+      x2Used = true;
       const btn = document.getElementById("btnX2");
-      btn.classList.remove("active");
       btn.disabled = true;
       btn.textContent = "Đã dùng quyền x2";
+      btn.classList.remove("active");
     }
   }
 </script>
 </body>
-</html>
+ </html>
