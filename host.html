@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Host - Game Phủ Xanh Rừng Trọc</title>
-<!-- Thư viện kết nối trực tiếp P2P không cần đăng ký tài khoản -->
+<title>Host - Trò Chơi: Cùng Chung Tay Bảo Vệ Rừng Xanh</title>
+<!-- Thư viện kết nối trực tiếp PeerJS & Tạo mã QR -->
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
@@ -12,7 +12,8 @@
   body { background: linear-gradient(180deg, #70c5ff 0%, #d4f0ff 45%, #bce6ab 100%); min-height: 100vh; color: #1c2833; overflow-x: hidden; }
   
   header { background: #1b5e20; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-  .btn-start { background: #e91e63; color: white; border: none; padding: 10px 24px; border-radius: 25px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+  header h1 { font-size: 1.35rem; }
+  .btn-start { background: #e91e63; color: white; border: none; padding: 10px 24px; border-radius: 25px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
   .btn-start:hover { transform: scale(1.05); background: #c2185b; }
   .btn-reset { background: #f57c00; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-left: 10px; }
 
@@ -20,8 +21,8 @@
   #lobbyScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 20px; text-align: center; }
   .qr-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-bottom: 20px; }
   #qrcode { margin: 15px auto; display: inline-block; }
-  .room-id-box { font-size: 1.2rem; font-weight: bold; color: #d81b60; margin: 10px 0; }
-  .player-count { font-size: 1.4rem; font-weight: bold; color: #1b5e20; margin-bottom: 15px; }
+  .room-id-box { font-size: 1.25rem; font-weight: bold; color: #d81b60; margin: 10px 0; }
+  .player-count { font-size: 1.3rem; font-weight: bold; color: #1b5e20; margin-bottom: 15px; }
   .players-grid { display: flex; flex-wrap: wrap; gap: 10px; max-width: 900px; justify-content: center; }
   .player-tag { background: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 6px; font-size: 1rem; border-left: 5px solid #2e7d32; }
 
@@ -29,27 +30,30 @@
   #gameScreen { display: none; grid-template-columns: 280px 1fr 340px; gap: 15px; padding: 15px; height: calc(100vh - 65px); }
   .panel { background: rgba(255, 255, 255, 0.95); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow-y: auto; }
   
-  .mountain-viewport { position: relative; background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%); border-radius: 20px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; }
+  /* NÚI 3D HÌNH CHÓP */
+  .mountain-viewport { position: relative; background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%); border-radius: 20px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.1); }
   #mountainSvg { width: 100%; height: 95%; max-height: 720px; }
   .tier-path { fill: #8D6E63; stroke: #5D4037; stroke-width: 2; transition: fill 0.8s ease; }
   .tier-path.green { fill: #43A047 !important; stroke: #2E7D32 !important; }
   .tier-path.summit-green { fill: #2E7D32 !important; stroke: #FFD700 !important; }
 
-  .timer-box { font-size: 1.5rem; font-weight: bold; color: #d32f2f; text-align: center; background: #ffebee; border-radius: 10px; padding: 5px; }
+  /* KHUNG CÂU HỎI & ĐỒNG HỒ 20S */
+  .timer-box { font-size: 1.6rem; font-weight: bold; color: #d32f2f; text-align: center; background: #ffebee; border-radius: 10px; padding: 6px; }
   .q-badge { background: #2e7d32; color: white; padding: 4px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; width: fit-content; }
-  .q-text { font-size: 1.05rem; font-weight: bold; color: #1b5e20; line-height: 1.4; }
-  .ans-option { padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; color: white; margin-bottom: 6px; }
+  .q-text { font-size: 1rem; font-weight: bold; color: #1b5e20; line-height: 1.45; }
+  .ans-option { padding: 9px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; color: white; margin-bottom: 6px; }
   .opt-0 { background: #e53935; }
   .opt-1 { background: #1e88e5; }
   .opt-2 { background: #fbc02d; color: #222; }
   .opt-3 { background: #43a047; }
   .ans-option.correct-highlight { outline: 4px solid #ffd700; font-weight: bold; }
+  .round-log { font-size: 0.85rem; font-weight: bold; color: #2e7d32; margin-top: auto; padding: 8px; background: #e8f5e9; border-radius: 8px; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🌲 Trò Chơi: Cùng Chung Tay Phủ Xanh Đồi Trọc</h1>
+  <h1>🌲 Trò Chơi: Cùng Chung Tay Bảo Vệ Rừng Xanh</h1>
   <div>
     <button class="btn-start" id="startBtn" onclick="startGame()">🚀 BẮT ĐẦU CHƠI</button>
     <button class="btn-reset" onclick="location.reload()">🔄 Đặt lại</button>
@@ -59,16 +63,16 @@
 <!-- SẢNH CHỜ KẾT NỐI -->
 <div id="lobbyScreen">
   <div class="qr-card">
-    <h2 style="color: #1b5e20;">Quét mã QR bằng camera điện thoại để tham gia:</h2>
+    <h2 style="color: #1b5e20;">Quét mã QR bằng điện thoại để tham gia:</h2>
     <div id="qrcode"></div>
-    <div class="room-id-box" id="roomCodeDisplay">Mã phòng: Đang tạo...</div>
-    <p id="playerUrl" style="color: #666; font-size: 0.85rem; word-break: break-all;"></p>
+    <div class="room-id-box" id="roomCodeDisplay">MÃ PHÒNG: Đang kết nối...</div>
+    <p id="playerUrl" style="color: #666; font-size: 0.82rem; word-break: break-all;"></p>
   </div>
-  <div class="player-count">Số đội đã vào phòng: <span id="connectedCount">0</span></div>
+  <div class="player-count">Số đội đã tham gia: <span id="connectedCount">0</span></div>
   <div class="players-grid" id="lobbyPlayers"></div>
 </div>
 
-<!-- MÀN HÌNH CHƠI -->
+<!-- MÀN HÌNH THI ĐẤU -->
 <div id="gameScreen">
   <div class="panel">
     <h3 style="color: #1b5e20; font-size: 1rem;">🏆 Tiến Độ Trồng Cây</h3>
@@ -105,16 +109,16 @@
   </div>
 
   <div class="panel">
-    <div class="timer-box" id="timerBox">⏱️ 15s</div>
+    <div class="timer-box" id="timerBox">⏱️ 20s</div>
     <div class="q-badge" id="qBadge">Câu 1 / 8</div>
     <div class="q-text" id="qText">Nội dung câu hỏi...</div>
     <div id="ansBox"></div>
-    <div id="roundFeedback" style="font-size: 0.85rem; font-weight: bold; color: #2e7d32; margin-top: auto;"></div>
+    <div class="round-log" id="roundFeedback">Quan sát và bấm chọn trên điện thoại!</div>
   </div>
 </div>
 
 <script>
-  // TẠO MÃ PHÒNG NGẪU NHIÊN 4 CHỮ SỐ
+  // KHỞI TẠO PEERJS & MÃ PHÒNG
   const roomId = 'room_' + Math.floor(1000 + Math.random() * 9000);
   const peer = new Peer(roomId);
 
@@ -123,7 +127,7 @@
   let currentAnswers = {};
   let curQIndex = 0;
   let timerInterval = null;
-  let timeLeft = 15;
+  let timeLeft = 20; // THỜI GIAN 20 GIÂY
   const tierYPositions = [570, 510, 450, 390, 330, 270, 210, 150, 95];
 
   peer.on('open', (id) => {
@@ -133,10 +137,9 @@
     document.getElementById('playerUrl').textContent = finalPlayUrl;
     
     document.getElementById('qrcode').innerHTML = '';
-    new QRCode(document.getElementById("qrcode"), { text: finalPlayUrl, width: 150, height: 150 });
+    new QRCode(document.getElementById("qrcode"), { text: finalPlayUrl, width: 145, height: 145 });
   });
 
-  // LẮNG NGHE KẾT NỐI TỪ ĐIỆN THOẠI HỌC SINH
   peer.on('connection', (conn) => {
     conn.on('data', (data) => {
       if (data.type === 'join') {
@@ -167,15 +170,88 @@
     });
   }
 
+  // 8 CÂU HỎI TRẮC NGHIỆM TỪ FILE CÔNG NGHỆ (LÂM NGHIỆP)
   const questions = [
-    { q: "Vai trò nào sau đây KHÔNG PHẢI là lợi ích của rừng nhiệt đới?", opts: ["Chống sạt lở lũ quét", "Hấp thụ CO2 & tạo Oxy", "Làm tăng hiệu ứng nhà kính", "Bảo tồn đa dạng sinh học"], ans: 2 },
-    { q: "Rừng mưa nhiệt đới thường phân bố thành mấy tầng tán chính?", opts: ["2 tầng", "3 tầng", "4 - 5 tầng", "Chỉ 1 tầng"], ans: 2 },
-    { q: "Đâu là loài cây gỗ quý đặc trưng của rừng nhiệt đới Đông Nam Á?", opts: ["Cây Bạch dương", "Cây Gõ đỏ", "Xương rồng sa mạc", "Thông tuyết"], ans: 1 },
-    { q: "Hiện tượng nguy hiểm nào xảy ra khi đồi núi bị tàn phá trơ trọi đất đá?", opts: ["Hạn hán kéo dài", "Lũ quét và sạt lở đất đá", "Đất chua hóa", "Bão cát"], ans: 1 },
-    { q: "Biện pháp phục hồi đồi núi trọc bền vững nhất là gì?", opts: ["Trồng xen cây bản địa đa loài", "Đốt sạch cỏ dại", "Chỉ trồng 1 loại cây duy nhất", "Đào xới toàn bộ đồi"], ans: 0 },
-    { q: "Rừng phòng hộ có nhiệm vụ cốt lõi nào sau đây?", opts: ["Khai thác gỗ tối đa", "Chắn gió, giữ nước, chống xói mòn", "Chăn thả gia súc", "Xây dựng nhà máy xưởng"], ans: 1 },
-    { q: "Hành động nào của học sinh góp phần bảo vệ tài nguyên rừng?", opts: ["Tiết kiệm giấy vở", "Nói không với thú rừng", "Tích cực trồng cây xanh", "Tất cả các ý trên"], ans: 3 },
-    { q: "Ngày Quốc tế về Rừng được kỷ niệm vào ngày nào hằng năm?", opts: ["21 tháng 3", "22 tháng 4", "05 tháng 6", "19 tháng 8"], ans: 0 }
+    { 
+      q: "Việc tổ chức tuyên truyền về vai trò, giá trị của rừng thuộc biện pháp bảo vệ tài nguyên rừng nào sau đây?", 
+      opts: [
+        "Trồng cây", 
+        "Nâng cao ý thức bảo vệ rừng", 
+        "Phòng chống cháy rừng", 
+        "Xây dựng các khu bảo tồn thiên nhiên"
+      ], 
+      ans: 1 
+    },
+    { 
+      q: "Vì sao trồng rừng, trồng cây xanh ở đô thị và nông thôn góp phần bảo vệ tài nguyên rừng?", 
+      opts: [
+        "Tạo nguồn gỗ cung cấp cho nhu cầu con người, nhờ đó giảm nhu cầu khai thác gỗ từ rừng", 
+        "Làm tăng lượng gỗ khai thác từ rừng tự nhiên", 
+        "Giúp người dân có thêm đất để đốt nương làm rẫy", 
+        "Làm giảm số lượng các khu bảo tồn thiên nhiên"
+      ], 
+      ans: 0 
+    },
+    { 
+      q: "Địa điểm nào sau đây là nơi trồng cây xanh ở khu vực nông thôn?", 
+      opts: [
+        "Công viên, vườn hoa", 
+        "Vỉa hè đường phố", 
+        "Khuôn viên trường học, bệnh viện", 
+        "Ven sông, kênh, mương, hành lang giao thông"
+      ], 
+      ans: 3 
+    },
+    { 
+      q: "Hành vi nào sau đây làm suy thoái tài nguyên rừng và bị nghiêm cấm?", 
+      opts: [
+        "Trồng rừng trên đất trống, đồi núi trọc", 
+        "Tập huấn phòng cháy, chữa cháy rừng", 
+        "Săn bắt thú rừng trái phép", 
+        "Lắp đặt biển báo ở khu vực rừng"
+      ], 
+      ans: 2 
+    },
+    { 
+      q: "Hoạt động nào sau đây KHÔNG phải là biện pháp phòng chống cháy rừng?", 
+      opts: [
+        "Lắp biển báo ở khu vực có nguy cơ cao cháy rừng", 
+        "Đốt nương làm rẫy để lấy đất canh tác", 
+        "Tập huấn cho chủ rừng và người dân về an toàn phòng cháy, chữa cháy rừng", 
+        "Chủ động chuẩn bị phương tiện, dụng cụ chữa cháy rừng"
+      ], 
+      ans: 1 
+    },
+    { 
+      q: "Bốn loại khu bảo tồn thiên nhiên gồm:", 
+      opts: [
+        "Rừng phòng hộ, rừng sản xuất, vườn quốc gia, khu dự trữ thiên nhiên", 
+        "Vườn quốc gia, rừng sản xuất, khu bảo vệ cảnh quan, rừng phòng hộ", 
+        "Khu dự trữ thiên nhiên, rừng đặc dụng, rừng phòng hộ, khu bảo tồn loài – sinh cảnh", 
+        "Vườn quốc gia, khu dự trữ thiên nhiên, khu bảo tồn loài – sinh cảnh, khu bảo vệ cảnh quan"
+      ], 
+      ans: 3 
+    },
+    { 
+      q: "Đa dạng sinh học là gì?", 
+      opts: [
+        "Sự phong phú về gene, loài sinh vật và hệ sinh thái trong tự nhiên", 
+        "Số lượng cây gỗ có trong một khu rừng", 
+        "Diện tích rừng được trồng mới hằng năm", 
+        "Số lượng các khu bảo tồn thiên nhiên của một quốc gia"
+      ], 
+      ans: 0 
+    },
+    { 
+      q: "Chính sách nào sau đây của Nhà nước khuyến khích người dân tham gia trồng rừng?", 
+      opts: [
+        "Cấm cho thuê đất để trồng rừng", 
+        "Dừng đầu tư cho rừng đặc dụng và rừng phòng hộ", 
+        "Miễn, giảm thuế đối với người trồng rừng", 
+        "Thu hồi đất trống, đồi núi trọc của hộ gia đình"
+      ], 
+      ans: 2 
+    }
   ];
 
   // ÂM THANH
@@ -215,7 +291,7 @@
 
   function startGame() {
     if (Object.keys(players).length === 0) {
-      alert("Chưa có đội nào tham gia! Vui lòng quét mã trên điện thoại trước.");
+      alert("Chưa có đội nào tham gia! Vui lòng đợi học sinh quét mã trên điện thoại.");
       return;
     }
     document.getElementById('lobbyScreen').style.display = 'none';
@@ -228,7 +304,7 @@
     curQIndex = idx;
     if (curQIndex >= questions.length) {
       document.getElementById('qBadge').textContent = 'KẾT THÚC!';
-      document.getElementById('qText').textContent = '🎉 Ngọn đồi đã được phủ kín cây xanh!';
+      document.getElementById('qText').textContent = '🎉 Tất cả câu hỏi đã hoàn tất. Ngọn đồi đã được phủ xanh!';
       broadcast({ type: 'end' });
       return;
     }
@@ -245,7 +321,8 @@
 
     broadcast({ type: 'new_question', qIndex: curQIndex });
 
-    timeLeft = 15;
+    // ĐẾM NGƯỢC 20 GIÂY
+    timeLeft = 20;
     document.getElementById('timerBox').textContent = `⏱️ ${timeLeft}s`;
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -280,7 +357,7 @@
     const winner = Object.values(players).find(p => p.step >= 8);
     if (winner) {
       playSound('birds');
-      setTimeout(() => alert(`🏆 Chúc mừng ${winner.name} đã chạm đỉnh phủ xanh ngọn đồi!`), 500);
+      setTimeout(() => alert(`🏆 Chúc mừng ${winner.name} đã chạm đỉnh nấc 8, phủ xanh toàn bộ ngọn đồi!`), 500);
     }
 
     setTimeout(() => startQuestion(curQIndex + 1), 4000);
@@ -333,4 +410,4 @@
   }
 </script>
 </body>
-           </html>
+   </html>
