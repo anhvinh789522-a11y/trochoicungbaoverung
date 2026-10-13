@@ -3,55 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Host: Phủ Xanh Ngọn Đồi Trọc</title>
+<title>Host - Kahoot Phủ Xanh Rừng Trọc</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root { --green-lush: #2E7D32; --gold: #FFD700; }
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
   body { background: linear-gradient(180deg, #70c5ff 0%, #d4f0ff 45%, #bce6ab 100%); min-height: 100vh; color: #1c2833; overflow-x: hidden; }
+  
   header { background: #1b5e20; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-  header h1 { font-size: 1.35rem; }
-  .btn-reset { background: #f57c00; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-  .btn-reset:hover { background: #e65100; transform: scale(1.03); }
-  .layout { display: grid; grid-template-columns: 290px 1fr 340px; gap: 15px; padding: 15px; height: calc(100vh - 65px); }
-  .panel { background: rgba(255, 255, 255, 0.95); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow-y: auto; }
-  .qr-box { background: #e8f5e9; border: 2px dashed #4caf50; border-radius: 12px; padding: 8px; text-align: center; }
-  #qrcode { margin: 6px auto; background: white; padding: 6px; display: inline-block; border-radius: 6px; }
-  .team-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 8px; background: #f9fbe7; border-left: 6px solid #4caf50; font-size: 0.85rem; }
-  .team-item.x2-active { border: 2px dashed #ff9800; background: #fff8e1; }
-  .mountain-viewport { position: relative; background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%); border-radius: 20px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.1); }
+  .btn-start { background: #e91e63; color: white; border: none; padding: 10px 24px; border-radius: 25px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  .btn-start:hover { transform: scale(1.05); background: #c2185b; }
+  .btn-reset { background: #f57c00; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-left: 10px; }
+
+  /* SẢNH CHỜ KẾT NỐI (LOBBY - TƯƠNG TỰ KAHOOT) */
+  #lobbyScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
+  .qr-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); margin-bottom: 25px; }
+  #qrcode { margin: 15px auto; display: inline-block; }
+  .player-count { font-size: 1.5rem; font-weight: bold; color: #1b5e20; margin-bottom: 15px; }
+  .players-grid { display: flex; flex-wrap: wrap; gap: 10px; max-width: 900px; justify-content: center; }
+  .player-tag { background: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 6px; font-size: 1rem; }
+
+  /* MÀN HÌNH GAME CHÍNH */
+  #gameScreen { display: none; grid-template-columns: 280px 1fr 340px; gap: 15px; padding: 15px; height: calc(100vh - 65px); }
+  .panel { background: rgba(255, 255, 255, 0.95); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow-y: auto; }
+  
+  /* NÚI SVG HÌNH CHÓP */
+  .mountain-viewport { position: relative; background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%); border-radius: 20px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; }
   #mountainSvg { width: 100%; height: 95%; max-height: 720px; }
   .tier-path { fill: #8D6E63; stroke: #5D4037; stroke-width: 2; transition: fill 0.8s ease; }
   .tier-path.green { fill: #43A047 !important; stroke: #2E7D32 !important; }
   .tier-path.summit-green { fill: #2E7D32 !important; stroke: #FFD700 !important; }
-  .quiz-card { display: flex; flex-direction: column; gap: 10px; }
-  .q-badge { align-self: flex-start; background: #2e7d32; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; }
-  .q-text { font-size: 0.98rem; font-weight: bold; color: #1b5e20; line-height: 1.4; }
-  .ans-option { background: #f5f5f5; border: 1px solid #cfd8dc; padding: 9px 12px; border-radius: 8px; font-size: 0.86rem; }
-  .ans-option.correct { background: #c8e6c9 !important; border-color: #2e7d32 !important; font-weight: bold; }
-  .status-log { font-size: 0.82rem; color: #333; background: #f0f4c3; padding: 8px; border-radius: 8px; margin-top: auto; border-left: 4px solid #afb42b; }
+
+  /* CÂU HỎI & ĐỒNG HỒ ĐẾM NGƯỢC */
+  .timer-box { font-size: 1.5rem; font-weight: bold; color: #d32f2f; text-align: center; background: #ffebee; border-radius: 10px; padding: 5px; }
+  .q-badge { background: #2e7d32; color: white; padding: 4px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; width: fit-content; }
+  .q-text { font-size: 1.05rem; font-weight: bold; color: #1b5e20; line-height: 1.4; }
+  .ans-option { padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; color: white; margin-bottom: 6px; }
+  .opt-0 { background: #e53935; }
+  .opt-1 { background: #1e88e5; }
+  .opt-2 { background: #fbc02d; color: #222; }
+  .opt-3 { background: #43a047; }
+  .ans-option.correct-highlight { outline: 4px solid #ffd700; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🌲 Cùng Chung Tay Phủ Xanh Ngọn Đồi Trọc</h1>
-  <button class="btn-reset" onclick="resetGame()">🔄 Bắt Đầu Lại</button>
+  <h1>🌲 Kahoot: Cùng Chung Tay Phủ Xanh Ngọn Đồi Trọc</h1>
+  <div>
+    <button class="btn-start" id="startBtn" onclick="startGame()">🚀 BẮT ĐẦU CHƠI</button>
+    <button class="btn-reset" onclick="resetGame()">🔄 Đặt lại</button>
+  </div>
 </header>
 
-<div class="layout">
+<!-- 1. MÀN HÌNH SẢNH CHỜ (LOBBY) -->
+<div id="lobbyScreen">
+  <div class="qr-card">
+    <h2 style="color: #1b5e20; margin-bottom: 5px;">Quét mã QR bằng điện thoại để tham gia:</h2>
+    <div id="qrcode"></div>
+    <p id="playerUrl" style="color: #555; font-size: 0.85rem; word-break: break-all;"></p>
+  </div>
+  <div class="player-count">Số đội đã tham gia: <span id="connectedCount">0</span></div>
+  <div class="players-grid" id="lobbyPlayers"></div>
+</div>
+
+<!-- 2. MÀN HÌNH THI ĐẤU -->
+<div id="gameScreen">
+  <!-- BẢNG XẾP HẠNG TIẾN ĐỘ -->
   <div class="panel">
-    <div class="qr-box">
-      <b style="color: #2e7d32; font-size: 0.82rem;">📲 Quét mã để vào đội thi:</b>
-      <div id="qrcode"></div>
-      <p id="playerUrl" style="font-size: 0.68rem; color: #666; word-break: break-all;"></p>
-    </div>
-    <h4 style="color: #1b5e20; font-size: 0.85rem;">10 Đội Trồng Rừng:</h4>
-    <div id="teamsList" style="display: flex; flex-direction: column; gap: 5px;"></div>
+    <h3 style="color: #1b5e20; font-size: 1rem;">🏆 Tiến Độ Trồng Cây</h3>
+    <div id="leaderboard" style="display: flex; flex-direction: column; gap: 6px;"></div>
   </div>
 
+  <!-- NÚI 3D HÌNH CHÓP -->
   <div class="mountain-viewport">
     <svg id="mountainSvg" viewBox="0 0 700 650" preserveAspectRatio="xMidYMid meet">
       <defs>
@@ -75,24 +100,24 @@
 
       <g transform="translate(250, 20)">
         <rect width="200" height="32" rx="16" fill="#ffd700" stroke="#b71c1c" stroke-width="2"/>
-        <text x="100" y="22" text-anchor="middle" fill="#b71c1c" font-size="13" font-weight="bold">🏆 ĐỈNH RỪNG XANH</text>
+        <text x="100" y="22" text-anchor="middle" fill="#b71c1c" font-size="13" font-weight="bold">🏆 ĐỈNH RÙNG XANH</text>
       </g>
-      <g id="treesContainerLayer"></g>
+      <g id="treesLayer"></g>
     </svg>
   </div>
 
+  <!-- CÂU HỎI & ĐÁP ÁN -->
   <div class="panel">
-    <div class="quiz-card">
-      <div class="q-badge" id="qBadge">Câu hỏi 1 / 8</div>
-      <div class="q-text" id="qText">Nội dung câu hỏi...</div>
-      <div id="ansBox" style="display:flex; flex-direction:column; gap:6px;"></div>
-    </div>
-    <div class="status-log" id="statusLog">📡 Đang chờ các đội bấm đáp án từ điện thoại...</div>
+    <div class="timer-box" id="timerBox">⏱️ 15s</div>
+    <div class="q-badge" id="qBadge">Câu 1 / 8</div>
+    <div class="q-text" id="qText">Nội dung câu hỏi...</div>
+    <div id="ansBox"></div>
+    <div id="roundFeedback" style="font-size: 0.85rem; font-weight: bold; color: #2e7d32; margin-top: auto;"></div>
   </div>
 </div>
 
 <script>
-  // CẤU HÌNH FIREBASE REALTIME DATABASE (Thay bằng config từ Firebase của bạn)
+  // CẤU HÌNH FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyCfRfGLxG48b8Cgj6PUCFNrrhpgjmn4i2A",
     authDomain: "vuihoccungcon-ac879.firebaseapp.com",
@@ -105,25 +130,14 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  const currentUrl = window.location.href;
-  const playUrl = currentUrl.replace("host.html", "play.html");
+  const playUrl = window.location.href.replace("host.html", "play.html");
   document.getElementById("playerUrl").textContent = playUrl;
-  new QRCode(document.getElementById("qrcode"), { text: playUrl, width: 110, height: 110 });
+  new QRCode(document.getElementById("qrcode"), { text: playUrl, width: 140, height: 140 });
 
-  const defaultTeams = [
-    { id: 1, name: "Cọ Nhiệt Đới", color: "#8BC34A", icon: "🌴", step: 0, x2Used: false, isX2: false },
-    { id: 2, name: "Keo Lá Tràm", color: "#FFD54F", icon: "🌾", step: 0, x2Used: false, isX2: false },
-    { id: 3, name: "Cây Gõ Đỏ", color: "#2E7D32", icon: "🌳", step: 0, x2Used: false, isX2: false },
-    { id: 4, name: "Tre Gai", color: "#4DB6AC", icon: "🎋", step: 0, x2Used: false, isX2: false },
-    { id: 5, name: "Giáng Hương", color: "#FFB74D", icon: "🍂", step: 0, x2Used: false, isX2: false },
-    { id: 6, name: "Cây Sao Đen", color: "#1B5E20", icon: "🌲", step: 0, x2Used: false, isX2: false },
-    { id: 7, name: "Cây Đước Đỏ", color: "#8D6E63", icon: "🌱", step: 0, x2Used: false, isX2: false },
-    { id: 8, name: "Bằng Lăng Rừng", color: "#BA68C8", icon: "🌺", step: 0, x2Used: false, isX2: false },
-    { id: 9, name: "Cây Dầu Rái", color: "#CDDC39", icon: "🌿", step: 0, x2Used: false, isX2: false },
-    { id: 10, name: "Cây Trầm Hương", color: "#37474F", icon: "🪴", step: 0, x2Used: false, isX2: false }
-  ];
-
-  let teams = JSON.parse(JSON.stringify(defaultTeams));
+  let players = {};
+  let curQIndex = 0;
+  let timerInterval = null;
+  let timeLeft = 15;
   const tierYPositions = [570, 510, 450, 390, 330, 270, 210, 150, 95];
 
   const questions = [
@@ -137,8 +151,7 @@
     { q: "Ngày Quốc tế về Rừng được kỷ niệm vào ngày nào hằng năm?", opts: ["21 tháng 3", "22 tháng 4", "05 tháng 6", "19 tháng 8"], ans: 0 }
   ];
 
-  let curQIndex = 0;
-
+  // ÂM THANH
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   function playSound(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -166,36 +179,131 @@
       gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
       gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
       osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-    } else {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(160, audioCtx.currentTime);
-      osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.25);
-      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.25);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.25);
     }
   }
 
-  function renderUI() {
-    const list = document.getElementById('teamsList');
-    list.innerHTML = '';
-    teams.forEach(t => {
-      const item = document.createElement('div');
-      item.className = `team-item ${t.isX2 ? 'x2-active' : ''}`;
-      item.style.borderLeftColor = t.color;
-      item.innerHTML = `<span>${t.icon} <b>${t.name}</b> ${t.isX2 ? '<b style="color:#e65100;">⭐x2</b>':''}</span><b>Nấc ${t.step}/8</b>`;
-      list.appendChild(item);
+  // LẮNG NGHE ĐỘI THAM GIA PHÒNG CHỜ
+  db.ref('players').on('value', (snapshot) => {
+    players = snapshot.val() || {};
+    const keys = Object.keys(players);
+    document.getElementById('connectedCount').textContent = keys.length;
+    
+    const lobbyDiv = document.getElementById('lobbyPlayers');
+    lobbyDiv.innerHTML = '';
+    keys.forEach(k => {
+      const p = players[k];
+      lobbyDiv.innerHTML += `<div class="player-tag">${p.icon} ${p.name}</div>`;
+    });
+    renderMountainAndBoard();
+  });
+
+  // GIÁO VIÊN BẤM NÚT BẮT ĐẦU CHƠI
+  function startGame() {
+    if (Object.keys(players).length === 0) {
+      alert("Chưa có đội nào tham gia! Hãy đợi học sinh quét mã.");
+      return;
+    }
+    document.getElementById('lobbyScreen').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'grid';
+    document.getElementById('startBtn').style.display = 'none';
+    
+    // Gửi thông báo bắt đầu lên Firebase
+    db.ref('gameState').set({ status: 'playing', currentQuestion: 0 });
+    startQuestion(0);
+  }
+
+  function startQuestion(qIndex) {
+    curQIndex = qIndex;
+    if (curQIndex >= questions.length) {
+      endGame();
+      return;
+    }
+    db.ref('gameState').update({ currentQuestion: curQIndex });
+    db.ref('answers').remove();
+
+    const q = questions[curQIndex];
+    document.getElementById('qBadge').textContent = `Câu ${curQIndex + 1} / ${questions.length}`;
+    document.getElementById('qText').textContent = q.q;
+    const ansBox = document.getElementById('ansBox');
+    ansBox.innerHTML = '';
+    q.opts.forEach((txt, idx) => {
+      ansBox.innerHTML += `<div class="ans-option opt-${idx}" id="opt-${idx}"><b>${String.fromCharCode(65+idx)}.</b> ${txt}</div>`;
     });
 
-    const layer = document.getElementById('treesContainerLayer');
+    timeLeft = 15;
+    document.getElementById('timerBox').textContent = `⏱️ ${timeLeft}s`;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timerBox').textContent = `⏱️ ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        endRound();
+      }
+    }, 1000);
+  }
+
+  // KẾT THÚC HẾT GIỜ CÂU HỎI & TÍNH ĐIỂM TIẾN BẬC
+  function endRound() {
+    const curAns = questions[curQIndex].ans;
+    const optEl = document.getElementById(`opt-${curAns}`);
+    if (optEl) optEl.classList.add('correct-highlight');
+
+    db.ref('answers').once('value', (snapshot) => {
+      const answers = snapshot.val() || {};
+      let correctTeams = [];
+
+      Object.keys(answers).forEach(pId => {
+        const ansData = answers[pId];
+        if (ansData.choice === curAns && players[pId]) {
+          const gain = ansData.isX2 ? 2 : 1;
+          players[pId].step = Math.min((players[pId].step || 0) + gain, 8);
+          db.ref(`players/${pId}/step`).set(players[pId].step);
+          correctTeams.push(players[pId].name);
+        }
+      });
+
+      if (correctTeams.length > 0) playSound('correct');
+      document.getElementById('roundFeedback').innerHTML = `Đội trả lời đúng: ${correctTeams.join(', ') || 'Không có đội nào'}`;
+      renderMountainAndBoard();
+
+      // Kiểm tra có đội nào chạm đỉnh 8 nấc chưa
+      const winner = Object.values(players).find(p => p.step >= 8);
+      if (winner) {
+        playSound('birds');
+        setTimeout(() => alert(`🏆 Chúc mừng ${winner.name} đã chạm đỉnh phủ xanh ngọn đồi!`), 500);
+      }
+
+      setTimeout(() => {
+        startQuestion(curQIndex + 1);
+      }, 4000);
+    });
+  }
+
+  function renderMountainAndBoard() {
+    const board = document.getElementById('leaderboard');
+    if (!board) return;
+    board.innerHTML = '';
+    
+    const sorted = Object.values(players).sort((a,b) => (b.step || 0) - (a.step || 0));
+    sorted.forEach(p => {
+      board.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:4px 0; border-bottom:1px solid #eee;">
+        <span>${p.icon} <b>${p.name}</b></span>
+        <b style="color:#2e7d32;">Bậc ${p.step || 0}/8</b>
+      </div>`;
+    });
+
+    // Vẽ cây lên nấc thang núi chóp
+    const layer = document.getElementById('treesLayer');
+    if (!layer) return;
     layer.innerHTML = '';
     const stepsGroup = {};
     for (let i = 0; i <= 8; i++) stepsGroup[i] = [];
-    teams.forEach(t => stepsGroup[Math.min(t.step, 8)].push(t));
+    Object.values(players).forEach(p => stepsGroup[Math.min(p.step || 0, 8)].push(p));
 
     for (let s = 1; s <= 8; s++) {
       const path = document.getElementById(`tier-${s}`);
-      const hasClimbers = teams.some(t => t.step >= s);
+      const hasClimbers = Object.values(players).some(p => (p.step || 0) >= s);
       if (hasClimbers) {
         if (s === 8) path.classList.add('summit-green');
         else path.classList.add('green');
@@ -212,74 +320,26 @@
       const startX = 350 - spanWidth / 2;
       const stepDist = occupants.length > 1 ? spanWidth / (occupants.length - 1) : 0;
 
-      occupants.forEach((team, idx) => {
+      occupants.forEach((p, idx) => {
         const x = occupants.length === 1 ? 350 : startX + idx * stepDist;
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         g.setAttribute("transform", `translate(${x}, ${y})`);
-        g.innerHTML = `<circle r="15" fill="#fff" stroke="${team.color}" stroke-width="3"/><text text-anchor="middle" dy="5" font-size="13">${team.icon}</text>`;
+        g.innerHTML = `<circle r="14" fill="#fff" stroke="${p.color || '#4CAF50'}" stroke-width="2.5"/><text text-anchor="middle" dy="4" font-size="12">${p.icon}</text>`;
         layer.appendChild(g);
       });
     }
-
-    if (curQIndex < questions.length) {
-      const cur = questions[curQIndex];
-      document.getElementById('qBadge').textContent = `Câu hỏi ${curQIndex + 1} / 8`;
-      document.getElementById('qText').textContent = cur.q;
-      const ansBox = document.getElementById('ansBox');
-      ansBox.innerHTML = '';
-      cur.opts.forEach((txt, idx) => {
-        ansBox.innerHTML += `<div class="ans-option"><b>${String.fromCharCode(65+idx)}.</b> ${txt}</div>`;
-      });
-    } else {
-      document.getElementById('qBadge').textContent = 'HOÀN THÀNH!';
-      document.getElementById('qText').textContent = '🎉 Ngọn núi đã được phủ xanh hoàn toàn!';
-      document.getElementById('ansBox').innerHTML = '<p style="color:#2e7d32; font-weight:bold;">Tất cả thử thách đã kết thúc!</p>';
-    }
   }
 
-  db.ref('answers').on('child_added', (snapshot) => {
-    const data = snapshot.val();
-    if (!data || curQIndex >= questions.length) return;
-
-    const team = teams.find(t => t.id === parseInt(data.teamId));
-    if (!team) return;
-
-    if (data.isX2 && !team.x2Used) team.isX2 = true;
-
-    const cur = questions[curQIndex];
-    const logBox = document.getElementById('statusLog');
-
-    if (data.choice === cur.ans) {
-      playSound('correct');
-      const gain = team.isX2 ? 2 : 1;
-      team.step = Math.min(team.step + gain, 8);
-      logBox.innerHTML = `✅ <b>${team.name}</b> trả lời đúng! Tiến +${gain} nấc!`;
-      
-      if (team.isX2) { team.isX2 = false; team.x2Used = true; }
-      renderUI();
-
-      if (team.step >= 8) {
-        playSound('birds');
-        setTimeout(() => alert(`🏆 ĐỘI ${team.name.toUpperCase()} ĐÃ CHẠM ĐỈNH NÚI!\nTiếng chim reo hót báo hiệu rừng xanh phục hồi!`), 300);
-      }
-
-      curQIndex++;
-      setTimeout(renderUI, 1200);
-    } else {
-      playSound('wrong');
-      logBox.innerHTML = `❌ <b>${team.name}</b> trả lời chưa đúng!`;
-      if (team.isX2) { team.isX2 = false; team.x2Used = true; renderUI(); }
-    }
-  });
+  function endGame() {
+    clearInterval(timerInterval);
+    document.getElementById('qBadge').textContent = 'KẾT THÚC!';
+    document.getElementById('qText').textContent = '🎉 Tất cả câu hỏi đã hoàn tất. Ngọn đồi đã được phủ xanh!';
+  }
 
   function resetGame() {
-    teams = JSON.parse(JSON.stringify(defaultTeams));
-    curQIndex = 0;
-    db.ref('answers').remove();
-    renderUI();
+    db.ref().remove();
+    location.reload();
   }
-
-  renderUI();
 </script>
 </body>
-</html>
+        </html>
