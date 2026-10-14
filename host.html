@@ -11,8 +11,8 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
   body { background: linear-gradient(180deg, #70c5ff 0%, #d4f0ff 45%, #bce6ab 100%); min-height: 100vh; color: #1c2833; overflow-x: hidden; }
   
-  header { background: #1b5e20; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-  header h1 { font-size: 1.35rem; }
+  header { background: #1b5e20; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+  header h1 { font-size: 1.3rem; }
   .btn-start { background: #e91e63; color: white; border: none; padding: 10px 24px; border-radius: 25px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
   .btn-start:hover { transform: scale(1.05); background: #c2185b; }
   .btn-reset { background: #f57c00; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-left: 10px; }
@@ -23,13 +23,18 @@
   #qrcode { margin: 15px auto; display: inline-block; }
   .room-id-box { font-size: 1.25rem; font-weight: bold; color: #d81b60; margin: 10px 0; }
   .player-count { font-size: 1.3rem; font-weight: bold; color: #1b5e20; margin-bottom: 15px; }
-  .players-grid { display: flex; flex-wrap: wrap; gap: 10px; max-width: 900px; justify-content: center; }
-  .player-tag { background: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 6px; font-size: 1rem; border-left: 5px solid #2e7d32; }
+  .players-grid { display: flex; flex-wrap: wrap; gap: 8px; max-width: 900px; justify-content: center; }
+  .player-tag { background: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 6px; font-size: 0.95rem; border-left: 4px solid #2e7d32; }
 
-  /* MÀN HÌNH GAME CHÍNH: CỘT CÂU HỎI MỞ RỘNG ĐỂ CHỮ TO HƠN */
-  #gameScreen { display: none; grid-template-columns: 260px 1fr 420px; gap: 15px; padding: 15px; height: calc(100vh - 65px); }
-  .panel { background: rgba(255, 255, 255, 0.96); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow-y: auto; }
+  /* BỐ CỤC CHÍNH: BẢNG TIẾN ĐỘ THU NHỎ (200px) - CÂU HỎI MỞ RỘNG CỰC ĐẠI (540px) */
+  #gameScreen { display: none; grid-template-columns: 200px 1fr 540px; gap: 12px; padding: 12px; height: calc(100vh - 60px); }
+  .panel { background: rgba(255, 255, 255, 0.96); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow-y: auto; }
   
+  /* BẢNG TIẾN ĐỘ THU NHỎ */
+  .leaderboard-title { font-size: 0.88rem; color: #1b5e20; font-weight: bold; border-bottom: 2px solid #c8e6c9; padding-bottom: 4px; }
+  .team-rank-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px dashed #eee; }
+  .team-rank-row b { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
   /* NÚI 3D HÌNH CHÓP */
   .mountain-viewport { position: relative; background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%); border-radius: 20px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.1); }
   #mountainSvg { width: 100%; height: 95%; max-height: 720px; }
@@ -37,21 +42,40 @@
   .tier-path.green { fill: #43A047 !important; stroke: #2E7D32 !important; }
   .tier-path.summit-green { fill: #2E7D32 !important; stroke: #FFD700 !important; }
 
-  /* KHUNG CÂU HỎI & ĐỒNG HỒ 30S ĐÃ TĂNG CỠ CHỮ */
-  .timer-box { font-size: 2rem; font-weight: 800; color: #d32f2f; text-align: center; background: #ffebee; border-radius: 12px; padding: 8px; letter-spacing: 1px; box-shadow: 0 2px 6px rgba(211,47,47,0.15); }
-  .q-badge { background: #2e7d32; color: white; padding: 5px 14px; border-radius: 12px; font-size: 0.95rem; font-weight: bold; width: fit-content; }
+  /* KHUNG CÂU HỎI VÀ ĐÁP ÁN CỠ LỚN CHO HỌC SINH BÀN CUỐI */
+  .timer-box { font-size: 2.2rem; font-weight: 800; color: #d32f2f; text-align: center; background: #ffebee; border-radius: 12px; padding: 6px; letter-spacing: 1px; }
+  .q-badge { background: #2e7d32; color: white; padding: 6px 16px; border-radius: 12px; font-size: 1.05rem; font-weight: bold; width: fit-content; }
   
-  /* CHỮ CÂU HỎI LỚN RÕ NÉT */
-  .q-text { font-size: 1.35rem; font-weight: 800; color: #1b5e20; line-height: 1.5; background: #f1f8e9; padding: 14px; border-radius: 12px; border-left: 6px solid #2e7d32; }
+  /* CHỮ CÂU HỎI SIÊU LỚN RÕ NÉT */
+  .q-text { 
+    font-size: 1.65rem; 
+    font-weight: 800; 
+    color: #0d3810; 
+    line-height: 1.5; 
+    background: #f1f8e9; 
+    padding: 16px 20px; 
+    border-radius: 14px; 
+    border-left: 8px solid #2e7d32;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
   
-  /* CỠ CHỮ CÁC Ô ĐÁP ÁN TO HƠN */
-  .ans-option { padding: 12px 16px; border-radius: 10px; font-size: 1.05rem; font-weight: 600; color: white; margin-bottom: 8px; line-height: 1.4; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+  /* CỠ CHỮ ĐÁP ÁN TO RÕ */
+  .ans-option { 
+    padding: 14px 18px; 
+    border-radius: 12px; 
+    font-size: 1.2rem; 
+    font-weight: 600; 
+    color: white; 
+    margin-bottom: 8px; 
+    line-height: 1.45; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12); 
+  }
   .opt-0 { background: #e53935; }
   .opt-1 { background: #1e88e5; }
   .opt-2 { background: #fbc02d; color: #111; }
   .opt-3 { background: #43a047; }
-  .ans-option.correct-highlight { outline: 5px solid #ffd700; transform: scale(1.02); }
-  .round-log { font-size: 0.95rem; font-weight: bold; color: #2e7d32; margin-top: auto; padding: 10px; background: #e8f5e9; border-radius: 10px; border: 1px solid #c8e6c9; }
+  .ans-option.correct-highlight { outline: 6px solid #ffd700; transform: scale(1.02); }
+  .round-log { font-size: 1.05rem; font-weight: bold; color: #1b5e20; margin-top: auto; padding: 12px; background: #e8f5e9; border-radius: 10px; border: 2px solid #a5d6a7; text-align: center; }
 </style>
 </head>
 <body>
@@ -78,11 +102,13 @@
 
 <!-- MÀN HÌNH THI ĐẤU -->
 <div id="gameScreen">
+  <!-- CỘT 1: BẢNG TIẾN ĐỘ THU NHỎ GỌN -->
   <div class="panel">
-    <h3 style="color: #1b5e20; font-size: 1.05rem;">🏆 Tiến Độ Trồng Cây</h3>
-    <div id="leaderboard" style="display: flex; flex-direction: column; gap: 6px;"></div>
+    <div class="leaderboard-title">📊 TIẾN ĐỘ CÁC ĐỘI</div>
+    <div id="leaderboard" style="display: flex; flex-direction: column; gap: 4px;"></div>
   </div>
 
+  <!-- CỘT 2: QUẢ NÚI 3D -->
   <div class="mountain-viewport">
     <svg id="mountainSvg" viewBox="0 0 700 650" preserveAspectRatio="xMidYMid meet">
       <defs>
@@ -112,6 +138,7 @@
     </svg>
   </div>
 
+  <!-- CỘT 3: CÂU HỎI CỰC ĐẠI CHO CẢ LỚP ĐỌC RÕ -->
   <div class="panel">
     <div class="timer-box" id="timerBox">⏱️ 30s</div>
     <div class="q-badge" id="qBadge">Câu 1 / 8</div>
@@ -130,7 +157,7 @@
   let currentAnswers = {};
   let curQIndex = 0;
   let timerInterval = null;
-  let timeLeft = 30; // CÀI ĐẶT THỜI GIAN 30 GIÂY
+  let timeLeft = 30; // 30 GIÂY
   const tierYPositions = [570, 510, 450, 390, 330, 270, 210, 150, 95];
 
   peer.on('open', (id) => {
@@ -173,7 +200,7 @@
     });
   }
 
-  // 8 CÂU HỎI TRẮC NGHIỆM TỪ TỆP CÔNG NGHỆ (LÂM NGHIỆP)
+  // 8 CÂU HỎI TRẮC NGHIỆM CHUẨN CÔNG NGHỆ (LÂM NGHIỆP)[cite: 2]
   const questions = [
     { 
       q: "Việc tổ chức tuyên truyền về vai trò, giá trị của rừng thuộc biện pháp bảo vệ tài nguyên rừng nào sau đây?", 
@@ -324,7 +351,6 @@
 
     broadcast({ type: 'new_question', qIndex: curQIndex });
 
-    // ĐẾM NGƯỢC CHUẨN 30 GIÂY
     timeLeft = 30;
     document.getElementById('timerBox').textContent = `⏱️ ${timeLeft}s`;
     clearInterval(timerInterval);
@@ -371,9 +397,9 @@
     board.innerHTML = '';
     const sorted = Object.values(players).sort((a,b) => (b.step || 0) - (a.step || 0));
     sorted.forEach(p => {
-      board.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:0.88rem; padding:5px 0; border-bottom:1px solid #eee;">
+      board.innerHTML += `<div class="team-rank-row">
         <span>${p.icon} <b>${p.name}</b></span>
-        <b style="color:#2e7d32;">Bậc ${p.step || 0}/8</b>
+        <span style="color:#2e7d32; font-weight:bold;">Nấc ${p.step || 0}/8</span>
       </div>`;
     });
 
